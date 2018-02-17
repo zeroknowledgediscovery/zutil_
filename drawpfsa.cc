@@ -8,6 +8,8 @@
 
 #include "semantic.h"
 
+#define DEBUG 0
+
 using namespace boost::program_options;
 
 const string VERSION="drawpfsa v1.0 \n Copyright Ishanu Chattopadhyay 2018";
@@ -36,6 +38,7 @@ vector<option> ignore_numbers(vector<string>& args)
       else
 	break;
     }
+  return result;
 }
 //------------------------------------
 int main(int argc, char *argv[])
@@ -70,7 +73,7 @@ int main(int argc, char *argv[])
     ("pi,p",value<bool>(&SHOW_PI), "show transition matrix [off]")
     ("gamma,G",value<bool>(&SHOW_GAMMA), "show Gamma matrix [off]");
 
-  options_description desc( "Algorithm genESeSS");
+  options_description desc( "Draw PFSA/XPFSA");
   desc.add(infor).add(usg);
 
   positional_options_description p;
@@ -132,7 +135,8 @@ int main(int argc, char *argv[])
   PFSA G(pit, aut,0,len);
 
   //cout << dotcfg << endl;
-  
+  if(DEBUG)
+    cout << pit.size() << endl;
 
   if (DRAW_GRAPH==1)
     G.drawGraph(graphname,dotcfg,title);
