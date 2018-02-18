@@ -42,49 +42,6 @@ int main(int argc, char *argv[])
 
 
 
-
-  //############ test #############
-  /*connx autA, autB;
-  map < state, map < symbol, double > > pitilde_mapA,pitilde_mapB;
-  cfg.set_map<state,symbol,double>(pitilde_mapA,"PITILDEA");
-  cfg.set_map<state,symbol,double>(pitilde_mapB,"PITILDEB");
-  cfg.set_map<state,symbol,state>(autA,"CONNXA");
-  cfg.set_map<state,symbol,state>(autB,"CONNXB");
-
-  if (1)
-    {
-      pitilde pit;  
-      //if (!RAND_PIT)
-      state c_state=0;
-      for ( map < state, map < symbol, double > >::iterator iti=pitilde_mapA.begin();
-	    iti != pitilde_mapA.end(); iti++)
-	{
-	  vector <double> vec_tmp;
-	  for (map <symbol, double>::iterator itj=iti->second.begin();
-	       itj != iti->second.end();
-	       itj++)
-	    vec_tmp.push_back(itj->second);
-	  pit[c_state++] = vec_tmp;
-	}
-      PFSA G1(pit, autA,0,len);
-
-      c_state=0;
-      for ( map < state, map < symbol, double > >::iterator iti=pitilde_mapB.begin();
-	    iti != pitilde_mapB.end(); iti++)
-	{
-	  vector <double> vec_tmp;
-	  for (map <symbol, double>::iterator itj=iti->second.begin();
-	       itj != iti->second.end();
-	       itj++)
-	    vec_tmp.push_back(itj->second);
-	  pit[c_state++] = vec_tmp;
-	}
-      PFSA G2(pit, autB,0,len);
-
-      PFSA H(G1|| G2);
-      H.drawGraph();
-    }
-  */
   //############ test #############
 
   //  cfg.set(RAND_PIT,"RANDOM_PITILDE");
@@ -94,6 +51,8 @@ int main(int argc, char *argv[])
 
   if (argc > 2)
     len = atoi(argv[2]);
+  if (argc > 3)
+    MC_PRINT_FILE = argv[3];
 
   /** pitilde matrix for PFSAs */ 
   pitilde pit;  
