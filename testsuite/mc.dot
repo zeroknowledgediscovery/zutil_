@@ -1,0 +1,23 @@
+digraph G {
+graph [
+bgcolor=transparent, dpi=600, rankdir=TD, size="40,25"];
+node [
+color=powderblue, fillcolor=mintcream, fontcolor=black, fontname=courier, fontsize=16, fontweight=bold, shape=circle, style=filled];
+edge [
+arrowsize=1, color=slateblue1, fontcolor=midnightblue, fontname=courier, fontsize=16, fontweight=bold, penwidth=1, style=solid, weight=20];
+0[label=<q<SUB>0</SUB>>];
+1[label=<q<SUB>1</SUB>>];
+2[label=<q<SUB>2</SUB>>];
+3[label=<q<SUB>3</SUB>>];
+4[label=<q<SUB>4</SUB>>];
+0->1 [label="0(0.59)"];
+0->2 [label="1(0.41)"];
+1->1 [label="0(0.64)"];
+1->3 [label="1(0.36)"];
+2->0 [label="0(0.37)"];
+2->0 [label="1(0.63)"];
+3->2 [label="0(0.33)"];
+3->4 [label="1(0.67)"];
+4->4 [label="0(0.70)"];
+4->3 [label="1(0.30)"];
+}

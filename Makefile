@@ -1,66 +1,54 @@
-CC = g++ 
-CFLAGS = -std=c++11 -static -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
-CFLAGS_DYN = -std=c++11  -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
+CC = g++ -std=c++11
+
+CFLAGS = -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
+CFLAGS =  -static -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
+
 ZBASE=./zbase
+
+LIBSO=  -lgomp  -lm 
+LIBS=   -lboost_system -lboost_thread -lboost_program_options -lboost_timer  -lboost_chrono -Bdynamic -lgsl -lgslcblas
 
 LIBSO=  -static-libstdc++ -static-libgcc -lgomp  -lm 
 LIBS=   -lboost_system -lboost_thread -lboost_program_options -lboost_timer  -lboost_chrono -Bdynamic -lgsl -lgslcblas
 LIBPATH= $(ZBASE)/lib
 
 DEPS = 
-
 INCLUDES = -I$(ZBASE)
 
 
-OBJ =   prun prunX drawpfsa pfsadyn2param  computepfsadistance
+OBJ =   llk prun prunX drawpfsa pfsadyn2param  computepfsadistance
 
-all:	prun prunX drawpfsa pfsadyn2param  computepfsadistance  clear mvbin
+all:	$(OBJ)  clear mvbin
 
-
-# compile libraries --------------------------------
-semantic.o: semantic.cc $(DEPS)
-	$(CC) -c -o $@ $< -fopenmp $(CFLAGS) $(INCLUDES); ar rcs libsemcrct.a semantic.o; rm semantic.o; mv libsemcrct.a ./lib
-
-config.o: config.cc $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS); ar rcs libconfigfile.a config.o; rm config.o; mv libconfigfile.a ./lib
 
 # compile binaries --------------------------------
 
 
-prun.o: prun.cc
+%.o :	%.cc
 	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
+
+llk: llk.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
 
 prun: prun.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lconfigfile -lsemcrct $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH)  -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
-
-drawpfsa.o: drawpfsa.cc
-	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
 drawpfsa: drawpfsa.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lconfigfile -lsemcrct $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
-
-prunX.o: prunX.cc
-	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
 prunX: prunX.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lconfigfile -lsemcrct $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
 
 
-pfsadyn2param.o: pfsadyn2param.cc
-	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
-
-
-computepfsadistance.o: computepfsadistance.cc
-	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
 pfsadyn2param:	pfsadyn2param.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lconfigfile -lsemcrct $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 
 computepfsadistance:	computepfsadistance.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lconfigfile -lsemcrct $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 
 
