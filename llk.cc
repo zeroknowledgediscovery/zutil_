@@ -12,7 +12,8 @@
 using namespace boost::program_options;
 //------------------------------------
 
-double log_likelihood(PFSA& G,symbol_list_ s)
+double log_likelihood(PFSA& G,
+		      const symbol_list_& s)
 {
   if(s.empty())
     return 0.0;
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
   string DATA_DIR="across";
   unsigned int len=10000000;
   
-  options_description desc( "###Loglikelihood zed.uchicago.edu 2018###\n\
+  options_description desc( "### Loglikelihood zed.uchicago.edu 2018 ###\n\
 --------------------------\n\
 Note: Multiple input sequences can be given,\n\
 one in each new line of the file (if data in rows) named with option -s\n\
