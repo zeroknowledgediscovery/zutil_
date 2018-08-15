@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
   string DATA_DIR="across";
   unsigned int len=10000000;
   
-  options_description desc( "###Loglikelihood zed.uchicago.edu 2018###\n--------------------------\nNote: Multiple input sequences can be given,\none in each new line of the file named with option -s\n--------------------------\nUsage");
+  options_description desc( "###Loglikelihood zed.uchicago.edu 2018###\n--------------------------\nNote: Multiple input sequences can be given,\none in each new line of the file named with option -s\n--------------------------\nExample (in testsuite directory): ../bin/llk -f S2.cfg -s seq.dat -x 100\n Usage");
   desc.add_options()
     ("help,h", "print help message.")
     ("version,V", "print version number")
