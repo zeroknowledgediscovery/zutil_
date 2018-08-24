@@ -34,7 +34,7 @@ double log_likelihood(PFSA& G,
       for(unsigned int st=0;st<numstates;++st)
 	pr+=map_pitcol[s[i]][st]*curr_state[st];
 
-      llk+=log(pr);
+      llk+=log2(pr);
 
       vector <double> state_vec_tmp(curr_state);
       for (unsigned int k=0; k < numstates; k++)
