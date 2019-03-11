@@ -16,7 +16,7 @@ DEPS =
 INCLUDES = -I$(ZBASE)
 
 
-OBJ =   llk prun prunX drawpfsa pfsadyn2param  computepfsadistance
+OBJ =   llk llk_yi  prun prunX drawpfsa pfsadyn2param  computepfsadistance
 
 all:	$(OBJ)  clear mvbin
 
@@ -28,6 +28,9 @@ all:	$(OBJ)  clear mvbin
 	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
 llk: llk.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
+
+llk_yi: llk_yi.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
 
 prun: prun.o
