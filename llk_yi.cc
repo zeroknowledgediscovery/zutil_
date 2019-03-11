@@ -7,12 +7,12 @@
 #include <set>
 #include "semantic.h"
 
-#define DEBUG_ 1
+#define DEBUG_ 0
 
 using namespace boost::program_options;
 //------------------------------------
 
-/*
+
 double log_likelihood(PFSA& G, const symbol_list_& seq)
 {
   	if(seq.empty())
@@ -24,9 +24,6 @@ double log_likelihood(PFSA& G, const symbol_list_& seq)
   	const unsigned int numstates = G.get_aut().size();
   	vector<double> curr_distr(G.get_Stationary());
 
-	cout << "I am here!" << endl;
-	getchar();
-
   	for(symbol s : seq)
     {
       	double pr = 0.0;
@@ -35,10 +32,9 @@ double log_likelihood(PFSA& G, const symbol_list_& seq)
 			pr += curr_distr[st] * G.get_pit()[st][s];
 		}
 
-		cout << s << ": " << pr;
       	llk += log2(pr);
 
-      	vector <double> nxt_distr(0.0, numstates);
+      	vector <double> nxt_distr(numstates, 0.0);
 	  	double sum = 0.0;
 
       	for (unsigned int st = 0; st < numstates; st++)
@@ -51,7 +47,6 @@ double log_likelihood(PFSA& G, const symbol_list_& seq)
 				sum += temp;
 			}
 		}
-		cout << "\t" << sum << endl;
       
       	for (unsigned int st = 0; st < numstates; st++)
 		{
@@ -60,7 +55,7 @@ double log_likelihood(PFSA& G, const symbol_list_& seq)
 	}
 	return -llk / seq.size();
 }
-*/
+
 
 //------------------------------------
 int main(int argc, char *argv[])
@@ -158,8 +153,8 @@ Example (in testsuite directory): ../bin/llk -f S2.cfg -s seq.dat -x 100\n Usage
   	vector<double> llk;
   	for(unsigned int i=0;i<Svec.size();++i)
 	{
-		llk.push_back(0.);
-    	// llk.push_back(log_likelihood(G,Svec[i].get_symbol_list()));
+		//llk.push_back(0.);
+    	llk.push_back(log_likelihood(G,Svec[i].get_symbol_list()));
 	}
   cout << llk << endl;
 
