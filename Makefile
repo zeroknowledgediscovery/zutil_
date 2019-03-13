@@ -1,4 +1,4 @@
-CC = g++ -std=c++11
+CC = g++ -std=c++17
 
 CFLAGS = -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
 CFLAGS =  -static -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
@@ -16,7 +16,7 @@ DEPS =
 INCLUDES = -I$(ZBASE)
 
 
-OBJ =   llk llk_yi  prun prunX drawpfsa pfsadyn2param  computepfsadistance
+OBJ =   lsmash llk llk_yi prun prunX drawpfsa pfsadyn2param  computepfsadistance
 
 all:	$(OBJ)  clear mvbin
 
@@ -27,6 +27,9 @@ all:	$(OBJ)  clear mvbin
 %.o :	%.cc
 	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
+lsmash: lsmash.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
+
 llk: llk.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
 
@@ -35,7 +38,6 @@ llk_yi: llk_yi.o
 
 prun: prun.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH)  -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
-
 
 drawpfsa: drawpfsa.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 

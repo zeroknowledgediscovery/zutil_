@@ -7,8 +7,11 @@ edge [
 arrowsize=1, color=slateblue1, fontcolor=midnightblue, fontname=courier, fontweight=bold, penwidth=1, style=solid, weight=20];
 0[label=<q<SUB>0</SUB>>];
 1[label=<q<SUB>1</SUB>>];
-0->0 [label="0(0.30)"];
-0->1 [label="1(0.70)"];
-1->0 [label="0(0.70)"];
-1->1 [label="1(0.30)"];
+2[label=<q<SUB>2</SUB>>];
+0->1 [label="0(0.30)"];
+0->2 [label="1(0.70)"];
+1->2 [label="0(0.70)"];
+1->0 [label="1(0.30)"];
+2->0 [label="0(0.60)"];
+2->1 [label="1(0.40)"];
 }
