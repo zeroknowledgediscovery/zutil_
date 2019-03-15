@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
   string DATA_DIR="across";
   unsigned int len=10000000;
   vector <double> partition;
-  string DATA_TYPE="continuous";
+  string DATA_TYPE="symbolic";
   bool DERIVATIVE=false;
   bool TIMER=true, PRINT_MC=false,RANDOMIZE=false;
   unsigned int RANDOM_MC=10;
