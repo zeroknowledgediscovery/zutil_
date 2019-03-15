@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   vector <double> partition;
   string DATA_TYPE="symbolic";
   bool DERIVATIVE=false;
-  bool TIMER=true, PRINT_MC=false,RANDOMIZE=false;
+  bool TIMER=true, PRINT_MC=false;
   unsigned int RANDOM_MC=10;
 
   options_description desc( "### Loglikelihood zed.uchicago.edu 2018 ###\n\
@@ -109,6 +109,7 @@ Example Usage:\n\
     ("pfsafile,f",value< vector<string> >(&pfsafile)->multitoken(), "pfsa files")
     ("timer,t",value< bool >(&TIMER), "display timer [1 (true)] ")
     ("dfile,o",value< string >(&ofile), "output file [L.dst]")
+    ("randomproj,R",value<unsigned int >(&RANDOM_MC), "no. of random machines to use [0]")
     ("machines,m",value< bool >(&PRINT_MC), "print PFSAs used [off]");
   positional_options_description p;
   variables_map vm;
@@ -166,7 +167,7 @@ Example Usage:\n\
     for(unsigned int i=0;i<pfsafile.size();++i)
       G.push_back(SCC_UTIL__::read_mc(pfsafile[i], "PFSA"));
 
-  if(RANDOMIZE)
+  if(RANDOM_MC>0)
     {
       size_t numG=G.size();
       for(unsigned int i=0;i<RANDOM_MC;++i)
@@ -195,12 +196,13 @@ Example Usage:\n\
   matrix_dbl D;
 
   vector <symbol_list_> S= R->getlist_vector();
-
+  /*
   for(unsigned int i=0;i<S.size();++i)
     {
       Symbolic_string_ s(S[i]);
       S[i]=(~s).get_symbol_list();
     }
+  */
   
   if (TIMER)
     {
@@ -208,7 +210,7 @@ Example Usage:\n\
       D= SCC_UTIL__::llk_distance(S,G);
     }
   else
-    D= SCC_UTIL__::llk_distance(R->getlist_vector(),G);
+    D= SCC_UTIL__::llk_distance(S,G);
     
   // cout << D << endl;
 
