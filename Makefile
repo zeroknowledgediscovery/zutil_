@@ -1,4 +1,4 @@
-CC = g++ -std=c++17
+CC = g++ -std=c++11
 
 CFLAGS = -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
 CFLAGS =  -static -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed

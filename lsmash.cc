@@ -41,11 +41,23 @@ vector<option> ignore_numbers(vector<string>& args)
 }
 //------------------------------------------------------
 
+connx autM2={{0,{{symbol(0),0},{symbol(1),1}}},
+	     {1,{{symbol(0),0},{symbol(1),1}}}};
+pitilde pitM2={{0,{0.3,0.7}},{1,{0.7,0.3}}};
+
+connx autS2={{0,{{symbol(0),0},{symbol(1),1}}},{1,{{symbol(0),1},{symbol(1),0}}}};
+pitilde pitS2={{0,{0.3,0.7}},{1,{0.7,0.3}}};
+
+connx autT3={{0,{{symbol(0),1},{symbol(1),2}}},{1,{{symbol(0),2},{symbol(1),0}}},{2,{{symbol(0),0},{symbol(1),1}}}};
+pitilde pitT3={{0,{0.3,0.7}},{1,{0.7,0.3}},{2,{0.6,0.4}}};
+
+connx autM4={{0,{{symbol(0),0},{symbol(1),1}}},{1,{{symbol(0),2},{symbol(1),3}}},{2,{{symbol(0),0},{symbol(1),1}}},{3,{{symbol(0),2},{symbol(1),3}}}};
+pitilde pitM4={{0,{0.3,0.7}},{1,{0.7,0.3}},{2,{0.8,0.2}},{3,{0.2,0.8}}};
 
 //------------------------------------
 int main(int argc, char *argv[])
 {
-  const string version="Log-Likelihood v0.9 2018 zed.uchicago.edu";
+  const string version="Log-Likelihood Smash v0.9 2019 zed.uchicago.edu";
   const string EMPTY_ARG_MESSAGE="Exiting. Type -h or --help for usage";
 
   string seqfile="seqfile.dat",ofile="L.dst";
@@ -60,12 +72,12 @@ int main(int argc, char *argv[])
 
   options_description desc( "### Loglikelihood zed.uchicago.edu 2018 ###\n\
 --------------------------\n\
-Note: Multiple input sequences can be given,\n\
-one in each new line of the file (if data in rows) named with option -s\n\
-If data is in columns, then each column is read as a new sequence\n\
-datadir is specified with option -D (deafult row)\n\
---------------------------\n\
-Example (in testsuite directory): ../bin/llk -f S2.cfg -s seq.dat -x 100\n Usage");
+Example Usage:\n\
+../bin/lsmash -s seq.dat\n\
+../bin/lsmash -s seq.dat -x 100 (restrict length of data read)\n\
+../bin/lsmash -s seq.dat -x 100 -o L.dst (specify output file)\n\
+../bin/lsmash -f S2.cfg M2.cfg T3.cfg -s seq.dat -x 100 (specify PFSA projectors)\n\
+ Usage");
   desc.add_options()
     ("help,h", "print help message.")
     ("version,V", "print version number")
@@ -98,11 +110,13 @@ Example (in testsuite directory): ../bin/llk -f S2.cfg -s seq.dat -x 100\n Usage
   if (vm.count("help"))
     {
       cout << desc << endl;
+      exit(0);
       return 1;
     }
   if (vm.count("version"))
     {
-      cout << version << endl; 
+      cout << version << endl;
+      exit(0);
       return 1;
     }
 
@@ -113,7 +127,15 @@ Example (in testsuite directory): ../bin/llk -f S2.cfg -s seq.dat -x 100\n Usage
     DATA_DIR="up";
 
   vector<PFSA> G;
-  for(unsigned int i=0;i<pfsafile.size();++i)
+  if(pfsafile.empty())
+    {
+      G.push_back(PFSA (pitM2,autM2));
+      G.push_back(PFSA (pitM4,autM4));
+      G.push_back(PFSA (pitS2,autS2));
+      G.push_back(PFSA (pitT3,autT3));
+    }
+  else
+    for(unsigned int i=0;i<pfsafile.size();++i)
       G.push_back(SCC_UTIL__::read_mc(pfsafile[i], "PFSA"));
   
   data_reader *R;
@@ -126,10 +148,18 @@ Example (in testsuite directory): ../bin/llk -f S2.cfg -s seq.dat -x 100\n Usage
   //cout << G.size() << endl;
   matrix_dbl D;
 
+  vector <symbol_list_> S= R->getlist_vector();
+
+  for(unsigned int i=0;i<S.size();++i)
+    {
+      Symbolic_string_ s(S[i]);
+      S[i]=(~s).get_symbol_list();
+    }
+  
   if (TIMER)
     {
       timer::auto_cpu_timer t;
-      D= SCC_UTIL__::llk_distance(R->getlist_vector(),G);
+      D= SCC_UTIL__::llk_distance(S,G);
     }
   else
     D= SCC_UTIL__::llk_distance(R->getlist_vector(),G);
