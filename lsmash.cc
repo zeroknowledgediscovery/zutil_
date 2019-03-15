@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
   string DATA_TYPE="symbolic";
   bool DERIVATIVE=false;
   bool TIMER=true, PRINT_MC=false;
-  unsigned int RANDOM_MC=10;
+  unsigned int RANDOM_MC=0;
 
   options_description desc( "### Loglikelihood zed.uchicago.edu 2018 ###\n\
 --------------------------\n\
