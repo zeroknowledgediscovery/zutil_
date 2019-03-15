@@ -6,12 +6,30 @@
 #include <exception>
 #include <set>
 #include <boost/timer/timer.hpp>
+#include <random>
 
 #include "semantic.h"
 
 #define DEBUG_ 0
 
 using namespace boost::program_options;
+//------------------------------------
+template<typename Numeric, typename Generator = std::mt19937>
+Numeric gen_random(Numeric from, Numeric to)
+{
+    thread_local static Generator gen(std::random_device{}());
+
+    using dist_type = typename std::conditional
+    <
+        std::is_integral<Numeric>::value
+        , std::uniform_int_distribution<Numeric>
+        , std::uniform_real_distribution<Numeric>
+    >::type;
+
+    thread_local static dist_type dist;
+
+    return dist(gen, typename dist_type::param_type{from, to});
+}
 //------------------------------------
 
 vector<option> ignore_numbers(vector<string>& args)
@@ -60,7 +78,7 @@ int main(int argc, char *argv[])
   const string version="Log-Likelihood Smash v0.9 2019 zed.uchicago.edu";
   const string EMPTY_ARG_MESSAGE="Exiting. Type -h or --help for usage";
 
-  string seqfile="seqfile.dat",ofile="L.dst";
+  string seqfile="",ofile="L.dst";
   vector<string> pfsafile;
   symbol_list_ seq;
   string DATA_DIR="across";
@@ -68,7 +86,8 @@ int main(int argc, char *argv[])
   vector <double> partition;
   string DATA_TYPE="continuous";
   bool DERIVATIVE=false;
-  bool TIMER=true;
+  bool TIMER=true, PRINT_MC=false,RANDOMIZE=false;
+  unsigned int RANDOM_MC=10;
 
   options_description desc( "### Loglikelihood zed.uchicago.edu 2018 ###\n\
 --------------------------\n\
@@ -89,11 +108,15 @@ Example Usage:\n\
     ("use_derivative,u",value<bool>(&DERIVATIVE), "use derivative [false]")
     ("pfsafile,f",value< vector<string> >(&pfsafile)->multitoken(), "pfsa files")
     ("timer,t",value< bool >(&TIMER), "display timer [1 (true)] ")
-    ("dfile,o",value< string >(&ofile), "output file [L.dst]");
+    ("dfile,o",value< string >(&ofile), "output file [L.dst]")
+    ("machines,m",value< bool >(&PRINT_MC), "print PFSAs used [off]");
   positional_options_description p;
   variables_map vm;
   if (argc == 1)
+    {
     cout <<"empty arg, type -h or --help" << endl;
+    exit(0);
+    }
   try
     {
       store(command_line_parser(argc, argv)
@@ -120,6 +143,11 @@ Example Usage:\n\
       return 1;
     }
 
+  if(seqfile=="")
+      MESSAGE("ERROR: empty seq file");
+  if(partition.empty())
+    DATA_TYPE="symbolic";
+  
   if (DATA_DIR=="row")
     DATA_DIR="across";
 
@@ -137,7 +165,25 @@ Example Usage:\n\
   else
     for(unsigned int i=0;i<pfsafile.size();++i)
       G.push_back(SCC_UTIL__::read_mc(pfsafile[i], "PFSA"));
+
+  if(RANDOMIZE)
+    {
+      size_t numG=G.size();
+      for(unsigned int i=0;i<RANDOM_MC;++i)
+	{
+	  PFSA G_=SCC_UTIL__::FWN(G[0].get_aut()[0].size());
+	  for(unsigned int j=0;j<numG;++j)
+	      G_=G_ + (G[j] * gen_random<int>(0, 1)
+		       * gen_random<double>(-2.0, 2.0));
+	  G.push_back(G_);
+	}
+      
+    }
   
+  if(PRINT_MC)
+    for(unsigned int i=0;i<G.size();++i)
+      G[i].mc_print();
+    
   data_reader *R;
   if (DATA_TYPE=="continuous")
     R = new data_reader(seqfile,DATA_DIR,partition,len,false,DERIVATIVE);
