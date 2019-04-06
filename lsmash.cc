@@ -155,13 +155,50 @@ Example Usage:\n\
   if (DATA_DIR=="column")
     DATA_DIR="up";
 
+    
+  data_reader *R;
+  if (DATA_TYPE=="continuous")
+    R = new data_reader(seqfile,DATA_DIR,partition,len,false,DERIVATIVE);
+  else
+    R = new data_reader(seqfile,DATA_DIR,len);
+
+
+  //cout << G.size() << endl;
+  matrix_dbl D;
+
+  vector <symbol_list_> S= R->getlist_vector();
+  
+  unsigned int alphabet=0;
+  for(unsigned int i=0;i<S.size();++i)
+    {
+      Symbolic_string_ s(S[i]);
+      symbol alph(s.get_alphabet());
+      if(s.get_alphabet()>alphabet)
+	alphabet=s.get_alphabet();
+      //S[i]=(~s).get_symbol_list();
+    }
+  
+  
   vector<PFSA> G;
   if(pfsafile.empty())
     {
-      G.push_back(PFSA (pitM2,autM2));
+      G.push_back(SCC_UTIL__::generate_mc(alphabet,
+					  alphabet,
+					  "M"));
+      G.push_back(SCC_UTIL__::generate_mc(alphabet,
+					  alphabet*alphabet,
+					  "M"));
+      G.push_back(SCC_UTIL__::generate_mc(alphabet,
+					  alphabet,
+					  "S"));
+      G.push_back(SCC_UTIL__::generate_mc(alphabet,
+					  alphabet*2,
+					  "T"));
+      /*      G.push_back(PFSA (pitM2,autM2));
       G.push_back(PFSA (pitM4,autM4));
       G.push_back(PFSA (pitS2,autS2));
       G.push_back(PFSA (pitT3,autT3));
+      */
     }
   else
     for(unsigned int i=0;i<pfsafile.size();++i)
@@ -184,26 +221,8 @@ Example Usage:\n\
   if(PRINT_MC)
     for(unsigned int i=0;i<G.size();++i)
       G[i].mc_print();
-    
-  data_reader *R;
-  if (DATA_TYPE=="continuous")
-    R = new data_reader(seqfile,DATA_DIR,partition,len,false,DERIVATIVE);
-  else
-    R = new data_reader(seqfile,DATA_DIR,len);
 
 
-  //cout << G.size() << endl;
-  matrix_dbl D;
-
-  vector <symbol_list_> S= R->getlist_vector();
-  /*
-  for(unsigned int i=0;i<S.size();++i)
-    {
-      Symbolic_string_ s(S[i]);
-      S[i]=(~s).get_symbol_list();
-    }
-  */
-  
   if (TIMER)
     {
       timer::auto_cpu_timer t;

@@ -16,7 +16,7 @@ DEPS =
 INCLUDES = -I$(ZBASE)
 
 
-OBJ =   lsmash llk llk_yi prun prunX drawpfsa pfsadyn2param  computepfsadistance
+OBJ =   genpfsa lsmash llk llk_yi prun prunX drawpfsa pfsadyn2param  computepfsadistance
 
 all:	$(OBJ)  clear mvbin
 
@@ -28,6 +28,8 @@ all:	$(OBJ)  clear mvbin
 	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
 lsmash: lsmash.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
+genpfsa: genpfsa.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
 
 llk: llk.o
