@@ -88,6 +88,9 @@ int main(int argc, char *argv[])
   bool DERIVATIVE=false;
   bool TIMER=true, PRINT_MC=false;
   unsigned int RANDOM_MC=0;
+  bool SAE=false;
+  unsigned int repeat=20;
+  unsigned int DEPTH=8;
 
   options_description desc( "### Loglikelihood zed.uchicago.edu 2018 ###\n\
 --------------------------\n\
@@ -108,6 +111,8 @@ Example Usage:\n\
     ("use_derivative,u",value<bool>(&DERIVATIVE), "use derivative [false]")
     ("pfsafile,f",value< vector<string> >(&pfsafile)->multitoken(), "pfsa files")
     ("timer,t",value< bool >(&TIMER), "display timer [1 (true)] ")
+    ("sae,S",value< bool >(&SAE), "use data smash for sae [0 (false)] ")
+    ("numrepeat,r",value< unsigned int >(&repeat), "repeat for sae [20] ")
     ("dfile,o",value< string >(&ofile), "output file [L.dst]")
     ("randomproj,R",value<unsigned int >(&RANDOM_MC), "no. of random machines to use [0]")
     ("machines,m",value< bool >(&PRINT_MC), "print PFSAs used [off]");
@@ -162,65 +167,8 @@ Example Usage:\n\
   else
     R = new data_reader(seqfile,DATA_DIR,len);
 
-
-  //cout << G.size() << endl;
   matrix_dbl D;
-
   vector <symbol_list_> S= R->getlist_vector();
-
-  /*
-  unsigned int alphabet=0;
-  for(unsigned int i=0;i<S.size();++i)
-    {
-      Symbolic_string_ s(S[i]);
-      symbol alph(s.get_alphabet());
-      if(s.get_alphabet()>alphabet)
-	alphabet=s.get_alphabet();
-      //S[i]=(~s).get_symbol_list();
-    }
-  
-  
-  vector<PFSA> G;
-  if(pfsafile.empty())
-    {
-      G.push_back(SCC_UTIL__::generate_mc(alphabet,
-					  alphabet,
-					  "M"));
-      G.push_back(SCC_UTIL__::generate_mc(alphabet,
-					  alphabet*alphabet,
-					  "M"));
-      G.push_back(SCC_UTIL__::generate_mc(alphabet,
-					  alphabet,
-					  "S"));
-      G.push_back(SCC_UTIL__::generate_mc(alphabet,
-					  alphabet*2,
-					  "T"));
-    }
-  else
-    for(unsigned int i=0;i<pfsafile.size();++i)
-      G.push_back(SCC_UTIL__::read_mc(pfsafile[i], "PFSA"));
-
-  if(RANDOM_MC>0)
-    {
-      size_t numG=G.size();
-      for(unsigned int i=0;i<RANDOM_MC;++i)
-	{
-	  PFSA G_=SCC_UTIL__::FWN(G[0].get_aut()[0].size());
-	  for(unsigned int j=0;j<numG;++j)
-	      G_=G_ + (G[j] * gen_random<int>(0, 1)
-		       * gen_random<double>(-2.0, 2.0));
-	  G.push_back(G_);
-	}
-      
-    }
-  
-  
-  if(PRINT_MC)
-    for(unsigned int i=0;i<G.size();++i)
-      G[i].mc_print();
-
-  */
-  
   if (TIMER)
     {
       timer::auto_cpu_timer t;
@@ -228,6 +176,34 @@ Example Usage:\n\
     }
   else
     D=llk_distance(S);
+
+  if(SAE)
+    {
+      unsigned int alphabet=0;
+      for(unsigned int i=0;i<S.size();++i)
+	{
+	  Symbolic_string_ s(S[i]);
+	  symbol alph(s.get_alphabet());
+	  if(s.get_alphabet()>alphabet)
+	    alphabet=s.get_alphabet();
+	}
+      unsigned int num_elements=S.size();
+      
+#pragma omp parallel for 
+      for (unsigned int i = 0; i < num_elements; i++)
+	{
+	  double sum=0.0;
+	  for (unsigned int r = 0; r < repeat; r++)
+	    {
+	      Symbolic_string_ a(S[i], alphabet);
+	      Symbolic_string_ tmp(!a + a);
+	      tmp.get_norm_new(DEPTH);
+	      sum += tmp.norm;
+	    }
+	  D[i][i] = sum/(repeat+0.0);
+	}
+    }
+  
     
   ofstream out(ofile.c_str());
   out << D;
