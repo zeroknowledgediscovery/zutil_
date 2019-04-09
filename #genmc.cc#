@@ -1,0 +1,160 @@
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/token_functions.hpp>
+#include <exception>
+#include <set>
+#include "semantic.h"
+#include "config.h"
+
+using namespace boost::program_options;
+
+
+
+
+PFSA read_mc(string filename, string TYPE__)
+{
+
+  connx aut;
+  pitilde pit, Xpit;
+  map < state, map < symbol, double > > pitilde_map;
+
+  CONFIG modfile(filename);
+  modfile.set_map<state,symbol,state>(aut,"CONNX");
+  modfile.set_map<state,symbol,double>(pitilde_map,"PITILDE");
+
+
+  PFSA *G;
+  state c_state=0;
+  for ( map < state, map < symbol, 
+	  double > >::iterator iti=pitilde_map.begin();
+	iti != pitilde_map.end();
+	iti++)
+    {
+      vector <double> vec_tmp;
+      for (map <symbol, double>::iterator itj=iti->second.begin();
+	   itj != iti->second.end();
+	   itj++)
+	vec_tmp.push_back(itj->second);
+      pit[c_state++] = vec_tmp;
+    }
+
+  if(TYPE__=="XPFSA")
+    {
+      pitilde pit2;
+      for (state  j=0; j < (int)aut.size();++j)
+	pit2[j]= vector <double> (aut[0].size(),1.0/(aut[0].size()+0.0));
+      G = new PFSA(pit2,aut);
+    }
+  else
+    G = new PFSA (pit,aut);
+  G->set_Xpit(pit);
+
+  return *G;
+};
+//-----------------------------------
+//-----------------------------------
+
+
+symbol_list_& nextstatew(symbol_list_& statew,unsigned int alphabet)
+{
+  if(statew.back()==symbol (alphabet-1))
+    {
+      statew.push_back(symbol(0));
+      statew.erase(statew.begin());
+    }
+  else
+    statew.back()=statew.back()+1;
+  return statew;
+}
+
+
+//-----------------------------------
+//-----------------------------------
+int main(int argc,char* argv[])
+{ 
+  const string version="Causality Networks v1.0 copyright Ishanu Chattopadhyay 2015";
+  const string EMPTY_ARG_MESSAGE="Exiting. Type -h or --help for usage";
+
+  string configfile="config.cfg";
+  vector <double> partition;
+  unsigned int len=1000;
+  string DATA_DIR="across";
+  string DATA_TYPE="continuous";
+  unsigned int depth=2;
+  unsigned int alphabet=2;
+
+  options_description desc( "Usage: ");
+  desc.add_options()
+    ("help,h", "print help message.")
+    ("version,V", "print version number")
+    ("datalen,x",value< unsigned int >(), "data length maximum for input sequence")
+    ("alphabet,a",value<unsigned int>(&alphabet), "alphabet size")
+    ("depth,d",value<unsigned int>(&depth), "depth");
+  positional_options_description p;
+  variables_map vm;
+  if (argc == 1)
+    cout <<"empty arg, type -h or --help" << endl;
+  try
+    {
+      store(command_line_parser(argc, argv)
+	    .options(desc)
+	    .run(), vm);
+      notify(vm);
+    } 
+  catch (std::exception &e)
+    {
+      cout << endl << e.what() 
+	   << endl << desc << endl;
+    }
+  if (vm.count("help"))
+    {
+      cout << desc << endl;
+      return 1;
+    }
+  if (vm.count("version"))
+    {
+      cout << version << endl; 
+      return 1;
+    }
+
+  if (vm.count("datalen"))
+    len=vm["datalen"].as<unsigned int>();
+
+  unsigned int numstates=pow(alphabet,depth);
+  symbol_list_ statew(depth,symbol (0));
+  map<symbol_list_,state> Q;
+  unsigned int count=0;
+  
+  Q[statew]=count;
+  for(unsigned int i=1;i<numstates;++i)
+    Q[nextstatew(statew,alphabet)]=++count;
+
+
+  connx aut;
+  map<symbol,state> row;
+  state thisstate=0;
+  for(state state_i=0;state_i<numstates;++state_i)
+    {
+      if(thisstate==numstates)
+	thisstate=0;
+      for(unsigned int j=0;j<alphabet;++j)
+	row[symbol(j)]=thisstate++;
+      aut[state_i]=row;
+    }
+  pitilde pit;
+  for(state state_i=0;state_i<numstates;++state_i)
+    {
+      vector<double> row_;
+      
+    }
+
+  for(unsigned int i=0;i<aut.size();++i)
+    {
+      for(symbol s(0);s<alphabet;++s)
+	cout << aut[i][s] << " ";
+      cout << endl;
+    }
+}
+

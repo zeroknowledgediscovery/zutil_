@@ -167,7 +167,8 @@ Example Usage:\n\
   matrix_dbl D;
 
   vector <symbol_list_> S= R->getlist_vector();
-  
+
+  /*
   unsigned int alphabet=0;
   for(unsigned int i=0;i<S.size();++i)
     {
@@ -194,11 +195,6 @@ Example Usage:\n\
       G.push_back(SCC_UTIL__::generate_mc(alphabet,
 					  alphabet*2,
 					  "T"));
-      /*      G.push_back(PFSA (pitM2,autM2));
-      G.push_back(PFSA (pitM4,autM4));
-      G.push_back(PFSA (pitS2,autS2));
-      G.push_back(PFSA (pitT3,autT3));
-      */
     }
   else
     for(unsigned int i=0;i<pfsafile.size();++i)
@@ -218,21 +214,21 @@ Example Usage:\n\
       
     }
   
+  
   if(PRINT_MC)
     for(unsigned int i=0;i<G.size();++i)
       G[i].mc_print();
 
-
+  */
+  
   if (TIMER)
     {
       timer::auto_cpu_timer t;
-      D= SCC_UTIL__::llk_distance(S,G);
+      D=llk_distance(S);
     }
   else
-    D= SCC_UTIL__::llk_distance(S,G);
+    D=llk_distance(S);
     
-  // cout << D << endl;
-
   ofstream out(ofile.c_str());
   out << D;
   out.close();
