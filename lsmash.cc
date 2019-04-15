@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
   const string version="Log-Likelihood Smash v0.9 2019 zed.uchicago.edu";
   const string EMPTY_ARG_MESSAGE="Exiting. Type -h or --help for usage";
 
-  string seqfile="",ofile="L.dst";
+  string seqfile="",ofile="H.dst";
   vector<string> pfsafile;
   symbol_list_ seq;
   string DATA_DIR="across";
