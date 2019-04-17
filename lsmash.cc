@@ -86,19 +86,19 @@ int main(int argc, char *argv[])
   vector <double> partition;
   string DATA_TYPE="symbolic";
   bool DERIVATIVE=false;
-  bool TIMER=true, PRINT_MC=false;
+  bool TIMER=false, PRINT_MC=false;
   unsigned int RANDOM_MC=0;
-  bool SAE=false;
+  bool SAE=true;
   unsigned int repeat=20;
   unsigned int DEPTH=8;
 
   options_description desc( "### Loglikelihood zed.uchicago.edu 2018 ###\n\
 --------------------------\n\
 Example Usage:\n\
-../bin/lsmash -s seq.dat\n\
-../bin/lsmash -s seq.dat -x 100 (restrict length of data read)\n\
-../bin/lsmash -s seq.dat -x 100 -o L.dst (specify output file)\n\
-../bin/lsmash -f S2.cfg M2.cfg T3.cfg -s seq.dat -x 100 (specify PFSA projectors)\n\
+../bin/lsmash -f seq.dat\n\
+../bin/lsmash -f seq.dat -x 100 (restrict length of data read)\n\
+../bin/lsmash -f seq.dat -x 100 -o L.dst (specify output file)\n\
+../bin/lsmash -F S2.cfg M2.cfg T3.cfg -f seq.dat -x 100 (specify PFSA projectors)\n\
  Usage");
   desc.add_options()
     ("help,h", "print help message.")
@@ -110,9 +110,9 @@ Example Usage:\n\
     ("partition,P",value< vector<double> >(&partition)->multitoken(), "partition")
     ("use_derivative,u",value<bool>(&DERIVATIVE), "use derivative [false]")
     ("pfsafile,F",value< vector<string> >(&pfsafile)->multitoken(), "pfsa files")
-    ("timer,t",value< bool >(&TIMER), "display timer [1 (true)] ")
-    ("sae,S",value< bool >(&SAE), "use data smash for sae [0 (false)] ")
-    ("numrepeat,r",value< unsigned int >(&repeat), "repeat for sae [20] ")
+    ("timer,t",value< bool >(&TIMER), "display timer [0 (false)] ")
+    ("sae,S",value< bool >(&SAE), "use data smash for sae [1 (true)] ")
+    ("numrepeat,n",value< unsigned int >(&repeat), "repeat for sae [20] ")
     ("dfile,o",value< string >(&ofile), "output file [L.dst]")
     ("randomproj,R",value<unsigned int >(&RANDOM_MC), "no. of random machines to use [0]")
     ("machines,m",value< bool >(&PRINT_MC), "print PFSAs used [off]");
