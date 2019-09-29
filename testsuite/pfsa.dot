@@ -4,11 +4,29 @@ bgcolor=transparent, dpi=600, rankdir=TD, size="40,25"];
 node [
 color=powderblue, fillcolor=mintcream, fontcolor=black, fontname=courier, fontsize=16, fontweight=bold, shape=circle, style=filled];
 edge [
-arrowsize=1, color=slateblue1, fontcolor=midnightblue, fontname=courier, fontweight=bold, penwidth=1, style=solid, weight=20];
+arrowsize=1, color=slateblue1, fontcolor=midnightblue, fontname=courier, fontsize=16, fontweight=bold, penwidth=1, style=solid, weight=20];
 0[label=<q<SUB>0</SUB>>];
 1[label=<q<SUB>1</SUB>>];
-0->0 [label="0(0.30)"];
-0->1 [label="1(0.70)"];
-1->0 [label="0(0.70)"];
-1->1 [label="1(0.30)"];
+2[label=<q<SUB>2</SUB>>];
+3[label=<q<SUB>3</SUB>>];
+4[label=<q<SUB>4</SUB>>];
+5[label=<q<SUB>5</SUB>>];
+6[label=<q<SUB>6</SUB>>];
+7[label=<q<SUB>7</SUB>>];
+0->1 [label="0(0.48)"];
+0->2 [label="1(0.52)"];
+1->3 [label="0(0.55)"];
+1->2 [label="1(0.45)"];
+2->4 [label="0(0.56)"];
+2->5 [label="1(0.44)"];
+3->0 [label="0(0.52)"];
+3->5 [label="1(0.48)"];
+4->4 [label="0(0.48)"];
+4->6 [label="1(0.52)"];
+5->3 [label="0(0.61)"];
+5->0 [label="1(0.39)"];
+6->7 [label="0(0.60)"];
+6->5 [label="1(0.40)"];
+7->3 [label="0(0.39)"];
+7->6 [label="1(0.61)"];
 }
