@@ -16,7 +16,7 @@ DEPS =
 INCLUDES = -I$(ZBASE)
 
 
-OBJ =   genpfsa lsmash llk llk_yi prun prunX drawpfsa pfsadyn2param  computepfsadistance
+OBJ =   genpfsa lsmash llk llk_yi llk_state prun prunX drawpfsa pfsadyn2param  computepfsadistance Quantizer_llk Quantizer_llk_aug Quantizer_llk_dist
 
 all:	$(OBJ)  clear mvbin
 
@@ -28,25 +28,37 @@ all:	$(OBJ)  clear mvbin
 	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
 lsmash: lsmash.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 genpfsa: genpfsa.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 llk: llk.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 llk_yi: llk_yi.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+llk_state: llk_state.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+Quantizer_llk: Quantizer_llk.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+Quantizer_llk_aug: Quantizer_llk_aug.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+Quantizer_llk_dist: Quantizer_llk_dist.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 prun: prun.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH)  -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 drawpfsa: drawpfsa.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 
 prunX: prunX.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile  $(LIBSO) $(LIBS) 
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 
 

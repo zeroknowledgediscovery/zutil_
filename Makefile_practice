@@ -1,0 +1,49 @@
+CC = g++ -std=c++17
+
+CFLAGS = -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
+CFLAGS =  -static -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
+
+ZBASE=./zbase
+
+LIBSO=  -lgomp  -lm 
+LIBS=   -lboost_system -lboost_thread -lboost_program_options -lboost_timer  -lboost_chrono -Bdynamic -lgsl -lgslcblas
+
+LIBSO=  -static-libstdc++ -static-libgcc -lgomp  -lm 
+LIBS=   -lboost_system -lboost_thread -lboost_program_options -lboost_timer  -lboost_chrono -Bdynamic -lgsl -lgslcblas
+LIBPATH= $(ZBASE)/lib
+
+DEPS = 
+INCLUDES = -I$(ZBASE)
+
+
+OBJ = practice
+
+all:	$(OBJ)  clear mvbin
+
+
+# compile binaries --------------------------------
+
+
+practice.o :	practice.cc
+	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
+
+practice:	practice.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+
+
+# utility commands --------------------------------
+
+clear:	
+	rm -rf *.o
+clean:	
+	rm -rf *.o *~ $(OBJ) *.tgz
+
+mvbin:
+	rm -rf ./bin_practice >&/dev/null; mkdir bin_practice; mv $(OBJ) ./bin_practice
+src:
+	tar -czvf src.tgz *.cc *.h Makefile Doxyfile
+ref:
+	doxygen Doxyfile; cd doc/latex; make; make
+
+ # EOF --------------------------------
