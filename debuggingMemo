@@ -1,0 +1,5 @@
+The Symbolic_string_ Symbolic_string_::operator*(PFSA &G) defined in semantic.cc uses pit instead Xpit when transducing a sequence using a XPFSA.
+
+For the time being, we can read an XPFSA as an PFSA in read_mc to avoid the problem. But may consider update it later.
+
+However, if a machine is characterized as PFSA, I am not sure whether keeping a pit is useful or not.
