@@ -16,7 +16,7 @@ DEPS =
 INCLUDES = -I$(ZBASE)
 
 
-OBJ = practice
+OBJ = llk_matrix test_zbase HMM_llk 
 
 all:	$(OBJ)  clear mvbin
 
@@ -24,12 +24,17 @@ all:	$(OBJ)  clear mvbin
 # compile binaries --------------------------------
 
 
-practice.o :	practice.cc
+%.o :	%.cc
 	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
-practice:	practice.o
+test_zbase:	test_zbase.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
+llk_matrix:	llk_matrix.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+HMM_llk:	HMM_llk.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 
 # utility commands --------------------------------
