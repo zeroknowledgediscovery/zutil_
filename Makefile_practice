@@ -16,7 +16,7 @@ DEPS =
 INCLUDES = -I$(ZBASE)
 
 
-OBJ = test_zbase test_zbase_random llk_matrix llk_matrix_random HMM_llk 
+OBJ = test_zbase test_zbase_random test_zbase_dist llk_matrix llk_matrix_random HMM_llk 
 
 all:	$(OBJ)  clear mvbin
 
@@ -31,6 +31,9 @@ test_zbase:	test_zbase.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 test_zbase_random:	test_zbase_random.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+test_zbase_dist:	test_zbase_dist.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 llk_matrix:	llk_matrix.o

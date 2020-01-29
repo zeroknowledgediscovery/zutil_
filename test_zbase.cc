@@ -60,9 +60,9 @@ int main(int argc, char** argv)
 
 	
 	PFSA G = SCC_UTIL__::read_mc(PFSA_file, "PFSA");
-	G.mc_print();
+	G.describe("G");
 	PFSA H = SCC_UTIL__::read_mc(XPFSA_file, "XPFSA");
-	H.mc_print();
+	H.describe("H");
 
 	
 	Symbolic_string_ input_ = G.gen_data(length);
@@ -98,14 +98,14 @@ int main(int argc, char** argv)
 	Omega = H.get_Omega();
 	for (vector<double> OmegaRow : Omega)
 	{
-		cout << "\t" << OmegaRow << endl;
+		cout << "\t" << OmegaRow;
 	}
 	
 	cout << "Omega of H with Input G:" << endl;
 	Omega = H.get_Omega(G);
 	for (vector<double> OmegaRow : Omega)
 	{
-		cout << "\t" << OmegaRow << endl;
+		cout << "\t" << OmegaRow;
 	}
   	return 0;
 }
