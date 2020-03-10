@@ -213,12 +213,20 @@ int main(int argc, char *argv[])
  	
 	options_description desc("### ###\n\
 --------------------------\n\
+IMPORTANT NOTICE: Can only be used with zbase in the github branch named Yi!\n\
 \n\
-\n\
-\n\
+Given the parameters of a PFSA in the form of \"input_num_states input_alphabet\",\n\
+the parameters of an XPFSA in the form of \"output_num_states output_alphabet\",\n\
+and a number of runs, \n\
+testGammaEst_Cor_1 generates randomly number of runs many new (PFSA, XPFSA) pairs\n\
+(connected ensured) according to the parameters,\n\
+and then calculates gamma from genESeSS_x and by using the new gamma estimation approach.\n\
+The goal of this experiment is to test the correlation of the two approaches.\n\
+NOTE: When reading the result using pandas, use the paramter comment='#' to skip the comment line.\n\
+The comment line stores the parameters.\n\
 \n\
 --------------------------\n\
-Example (in ... folder):");
+Example (in the zutil_ folder): bin_practice/testGammaEst_Cor_1 -q \"3 2\" -y \"4 3\" -l 2000 -d 5 -n 100 -f testGammaEst_result/testGammaEst_Cor_1_example");
   	desc.add_options()
     ("help,h", "print help message.")
     ("version,V", "print version number")
@@ -260,10 +268,6 @@ generated XPFSA. Input in the form \"output_num_states output_alphabet\"")
 	if (vm.count("filename")==0)
 	{
 		filename = "result_" + currentDateTime() + ".dat"; 
-	}
-	else
-	{
-		filename += currentDateTime() + ".dat";
 	}
 
 

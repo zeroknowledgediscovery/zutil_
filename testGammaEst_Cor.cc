@@ -229,12 +229,18 @@ int main(int argc, char *argv[])
  	
 	options_description desc("### ###\n\
 --------------------------\n\
+IMPORTANT NOTICE: Can only be used with zbase in the github branch named Yi!\n\
 \n\
-\n\
-\n\
+Given the config files of a PFSA and XPFSA and a number of runs, \n\
+testGammaEst_Cor generates randomly number of runs many new (PFSA, XPFSA) pairs\n\
+using the transition maps of that of the given PFSA and XPFSA,\n\
+and then calculates gamma from genESeSS_x and by using the new gamma estimation approach.\n\
+The goal of this experiment is to test the correlation of the two approaches.\n\
+NOTE: When reading the result using pandas, use the paramter comment='#' to skip the comment line.\n\
+The comment line stores the parameters.\n\
 \n\
 --------------------------\n\
-Example (in ... folder):");
+Example (in the zutil_ folder): bin_practice/testGammaEst_Cor -p cfgfiles/PFSA_M2_3.cfg -x cfgfiles/XPFSA_2_4_7.cfg -l 2000 -d 5 -n 100 -f testGammaEst_result/testGammaEst_Cor_example");
   	desc.add_options()
     ("help,h", "print help message.")
     ("version,V", "print version number")
@@ -273,10 +279,6 @@ Example (in ... folder):");
 	if (vm.count("filename")==0)
 	{
 		filename = "result_" + currentDateTime() + ".dat"; 
-	}
-	else
-	{
-		filename += currentDateTime() + ".dat";
 	}
 
 	string configfile = "config.cfg";

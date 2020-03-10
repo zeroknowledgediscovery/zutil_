@@ -139,11 +139,6 @@ DataPhi get_count(
 			}
 		}
 		counts[itr->first] = count;
-		
-		// cout << itr->first << ": ";
-		// for (unsigned int c : count)
-		// 	cout << std::dec << c << " ";
-		// cout << get_entropy(count) << endl;
 	}
 	return counts;
 }
@@ -228,20 +223,25 @@ int main(int argc, char *argv[])
  	
 	options_description desc("### ###\n\
 --------------------------\n\
+IMPORTANT NOTICE: Can only be used with zbase in the github branch named Yi!\n\
 \n\
-\n\
-\n\
+Given the config files of a PFSA and XPFSA and a number of runs, \n\
+testGammaEst calculates gamma from genESeSS_x and by using\n\
+the new gamma estimation approach.\n\
+The result is saved and can be used to test the stability of the two approaches.\n\
+NOTE: When reading the result using pandas, use the paramter comment='#' to skip the comment line.\n\
+The comment line stores the parameters and run times.\n\
 \n\
 --------------------------\n\
-Example (in ... folder):");
+Example (in the zutil_ folder): bin_practice/testGammaEst -p cfgfiles/PFSA_M2_3.cfg -x cfgfiles/XPFSA_2_4_7.cfg -l 2000 -d 5 -n 100 -f testGammaEst_result/testGammaEst_example");
   	desc.add_options()
     ("help,h", "print help message.")
     ("version,V", "print version number")
     ("pfsa,p", value<string>(&PFSA_filename), "PFSA file")
     ("xpfsa,x", value<string>(&XPFSA_filename), "XPFSA file")
     ("length,l", value<size_t>(&length)->default_value(1000), "Length of the sequence")
-    ("depth,d", value<size_t>(&depth), "subsequence length with which the cross derivatives are calculated")
-    ("num_runs,n", value<size_t>(&num_runs), "number of runs")
+    ("depth,d", value<size_t>(&depth)->default_value(5), "subsequence length with which the cross derivatives are calculated")
+    ("num_runs,n", value<size_t>(&num_runs)->default_value(200), "number of runs")
     ("filename,f", value<string>(&filename), "filename for output gamma comparison file (default is current time)");
   	positional_options_description p;
   	variables_map vm;
@@ -291,94 +291,82 @@ Example (in ... folder):");
 	x_num_states = x_aut.size();
 	x_alphabet = x_aut[0].size();
 	
-	cout << "\n\nSanity Check" << endl;
 	
-	Symbolic_string_ input_ = G.gen_data(length);
-	Symbolic_string_ output_ = input_ * H;
-	symbol_list_ input = input_.get_symbol_list();
-	symbol_list_ output = output_.get_symbol_list();
-	cout << "Input:\n" << input_ << endl;
-	cout << "Output:\n" << output_ << endl;
+	Symbolic_string_ input_;
+	Symbolic_string_ output_;
+	symbol_list_ input;
+	symbol_list_ output;
+	
+	cout << "\n\nStability Comparison" << endl;
+	 
+	clock_t start, end; 
 
-	genESeSS_x AB(input_, output_, parameters);
-	
-	double gamma = AB.gamma();	
-	cout << "gamma = " << gamma << endl;
-	
-	double gamma_1 = estimate_gamma(input, output, alphabet, x_alphabet, depth);
-	cout << "estimated gamma with depth = " << depth << ": " << gamma_1 << endl;
+	start = clock();
+	for (size_t n = 0; n < num_runs; n++)
+	{
+		input_ = G.gen_data(length);
+		output_ = input_ * H;
+		input = input_.get_symbol_list();
+		output = output_.get_symbol_list();
+	}
+	end = clock();
+	double time_dataGen = double(end - start) / double(CLOCKS_PER_SEC);
 
-	// cout << "\n\nStability Comparison" << endl;
+
+	vector<double> gamma_es(num_runs, 0);
+	start = clock();
+	for (size_t n = 0; n < num_runs; n++)
+	{
+		input_ = G.gen_data(length);
+		output_ = input_ * H;
+		input = input_.get_symbol_list();
+		output = output_.get_symbol_list();
 		
-	// clock_t start, end; 
+		double gamma_1 = estimate_gamma(input, output, alphabet, x_alphabet, depth);
+		gamma_es[n] = gamma_1;
+		cout << n << ": " << gamma_1 << endl;
+	}
+	end = clock();
+	double time_est = double(end - start) / double(CLOCKS_PER_SEC);
+	
+	vector<double> gamma_xg(num_runs, 0);
+	start = clock();
+	for (size_t n = 0; n < num_runs; n++)
+	{
+		input_ = G.gen_data(length);
+		output_ = input_ * H;
+		input = input_.get_symbol_list();
+		output = output_.get_symbol_list();
+		
+		genESeSS_x AB(input_, output_, parameters);
+		double gamma = AB.gamma();	
+		gamma_xg[n] = gamma;
+		cout << n << ": " << gamma  << endl;
+	}
+	end = clock();
+	double time_xg = double(end - start) / double(CLOCKS_PER_SEC);
+	
+	cout << "data generate for " << std::dec << num_runs << " rounds is ";
+	cout << fixed << time_dataGen << setprecision(5) << endl;
+	cout << "est gamma for " << std::dec << num_runs << " rounds is ";
+	cout << fixed << time_est - time_dataGen << setprecision(5) << endl;
+	cout << "xg gamma for " << std::dec << num_runs << " rounds is ";
+	cout << fixed << time_xg - time_dataGen << setprecision(5) << endl;
 
-	// start = clock();
-	// for (size_t n = 0; n < num_runs; n++)
-	// {
-	// 	input_ = G.gen_data(length);
-	// 	output_ = input_ * H;
-	// 	input = input_.get_symbol_list();
-	// 	output = output_.get_symbol_list();
-	// }
-	// end = clock();
-	// double time_dataGen = double(end - start) / double(CLOCKS_PER_SEC);
-
-
-	// vector<double> gamma_es(num_runs, 0);
-	// start = clock();
-	// for (size_t n = 0; n < num_runs; n++)
-	// {
-	// 	input_ = G.gen_data(length);
-	// 	output_ = input_ * H;
-	// 	input = input_.get_symbol_list();
-	// 	output = output_.get_symbol_list();
-	// 	
-	// 	gamma_1 = estimate_gamma(input, output, alphabet, x_alphabet, depth);
-	// 	gamma_es[n] = gamma_1;
-	// 	cout << n << ": " << gamma_1 << endl;
-	// }
-	// end = clock();
-	// double time_est = double(end - start) / double(CLOCKS_PER_SEC);
-	// 
-	// vector<double> gamma_xg(num_runs, 0);
-	// start = clock();
-	// for (size_t n = 0; n < num_runs; n++)
-	// {
-	// 	input_ = G.gen_data(length);
-	// 	output_ = input_ * H;
-	// 	input = input_.get_symbol_list();
-	// 	output = output_.get_symbol_list();
-	// 	
-	// 	genESeSS_x AB(input_, output_, parameters);
-	// 	gamma = AB.gamma();	
-	// 	gamma_xg[n] = gamma;
-	// 	cout << n << ": " << gamma  << endl;
-	// }
-	// end = clock();
-	// double time_xg = double(end - start) / double(CLOCKS_PER_SEC);
-	// 
-	// 
-	// cout << "data generate for " << std::dec << num_runs << " rounds is ";
-	// cout << fixed << time_dataGen << setprecision(5) << endl;
-	// cout << "est gamma for " << std::dec << num_runs << " rounds is ";
-	// cout << fixed << time_est << setprecision(5) << endl;
-	// cout << "xg gamma for " << std::dec << num_runs << " rounds is ";
-	// cout << fixed << time_xg << setprecision(5) << endl;
-
-	// ofstream log;
-	// log.open(filename);
-	// log << "#PFSA=" + PFSA_filename;
-	// log << ",XPFSA=" + XPFSA_filename;
-	// log << ",sequence length=" + to_string(length);
-	// log << ",depth for estimating gamma=" + to_string(depth);
-	// log << ",numbers of runs=" + to_string(num_runs);
-	// log << ",data generation time=" + to_string(time_dataGen);
-	// log << ",xg time=" + to_string(time_xg - time_dataGen);
-	// log << ",est time=" + to_string(time_est - time_dataGen) << endl;
-	// log << "xg,est" << endl;
-	// for (size_t n = 0; n < num_runs; n++)
-	// {
-	// 	log << gamma_xg[n] << "," << gamma_es[n] << endl; 
-	// }
-	// log.close();
+	ofstream log;
+	log.open(filename);
+	log << "#PFSA=" + PFSA_filename;
+	log << ",XPFSA=" + XPFSA_filename;
+	log << ",sequence length=" + to_string(length);
+	log << ",depth for estimating gamma=" + to_string(depth);
+	log << ",numbers of runs=" + to_string(num_runs);
+	log << ",data generation time=" + to_string(time_dataGen);
+	log << ",xg time=" + to_string(time_xg - time_dataGen);
+	log << ",est time=" + to_string(time_est - time_dataGen) << endl;
+	log << "xg,est" << endl;
+	for (size_t n = 0; n < num_runs; n++)
+	{
+		log << gamma_xg[n] << "," << gamma_es[n] << endl; 
+	}
+	log.close();
 }
