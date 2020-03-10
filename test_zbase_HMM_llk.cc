@@ -35,45 +35,6 @@ string get_name(string path)
 }
 
 
-
-double HMM_log_likelihood(PFSA& H, symbol_list_ sl)
-{
-	// The PFSA H has to have Xpit
-	connx aut = H.get_aut();
-	pitilde pit = H.get_pit();
-	pitilde Xpit = H.get_Xpit();
-	size_t num_states = aut.size();
-	
-	// size_t alphabet_i = aut[0].size();
-	// size_t alphabet_o = Xpit[0].size();
-
-	vector<double> distr = H.get_Stationary();
-	vector<vector<double>> PI = H.get_PI();
-
-	double llk = 0.;
-	for (symbol symb : sl)
-	{
-		double sum = 0.;
-		vector<double> new_distr(num_states, 0.);
-		for (size_t i = 0; i < num_states; i++)
-		{
-			double tmp = distr[i] * Xpit[i][symb];
-			sum += tmp;
-			for (size_t j = 0; j < num_states; j++)
-			{
-				new_distr[j] += tmp * PI[i][j];
-			}
-		}
-		for (size_t i = 0; i < num_states; i++)
-		{
-			new_distr[i] /= sum;
-		}
-		llk -= log2(sum);
-		distr = new_distr;
-	}
-	return llk / sl.size(); 
-}
-
 void test(PFSA& G, PFSA& H, size_t length)
 {
 	symbol_list_ sl = G.gen_data(length).get_symbol_list();
@@ -84,7 +45,7 @@ void test(PFSA& G, PFSA& H, size_t length)
 	double llk_G = G.log_likelihood(sl);
 	cout << "llk of G  = " << llk_G << endl;
 	
-	double llk_HMM = HMM_log_likelihood(Comp, sl);
+	double llk_HMM = Comp.HMM_log_likelihood(sl);
 	cout << "llk of H(G) = " << llk_HMM << endl;
 }
 
@@ -97,7 +58,7 @@ void test_stat(PFSA& G, PFSA& H, size_t length, size_t num_runs)
 	for (size_t n = 0; n < num_runs; n++)
 	{
 		symbol_list_ sl = G.gen_data(length).get_symbol_list();
-		double llk = HMM_log_likelihood(Comp, sl);
+		double llk = Comp.HMM_log_likelihood(sl);
 		// cout << n << ": " << llk << endl;
 		llks.push_back(llk);
 	}
@@ -109,7 +70,7 @@ void test_stat(PFSA& G, PFSA& H, size_t length, size_t num_runs)
 	cout << "std = " << std << endl;
 }
 
-void test_eigen(
+void test_matrix(
 	PFSA& G, 
 	PFSA& H, 
 	vector<double> scale, 
@@ -136,7 +97,7 @@ void test_eigen(
 		for (size_t j = 0; j < num_steps; j++) 
 		{
 			symbol_list_ sl = PFSA_vec[j].gen_data(length).get_symbol_list();
-			double llk = HMM_log_likelihood(Comp, sl);
+			double llk = Comp.HMM_log_likelihood(sl);
 			llk_matrix[i][j] = llk;
 		}		
 	}
@@ -203,7 +164,7 @@ int main(int argc, char** argv)
 
 	cout << "\n############################### Test Matrix: ###########################" << endl;
 	string output = "llk_matrices/HHM_llk-" + get_name(PFSA_file) + "-" + get_name(XPFSA_file); 
-	test_eigen(G, H, scale, length, output);
+	test_matrix(G, H, scale, length, output);
 	cout << "############################# Test Matrix END: #########################\n" << endl;
 	
   	return 0;
