@@ -1,3 +1,9 @@
+/*
+ * Test the new function in the Yi branch of zbase 
+ * on generating random PFSA/XPFSA.
+ */
+
+
 #include <iostream>
 #include <fstream>
 #include <string>
