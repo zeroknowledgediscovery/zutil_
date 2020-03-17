@@ -176,6 +176,7 @@ Example (in zutil_ folder):\n\
 
 	PFSA G = SCC_UTIL__::read_mc(PFSA_filename, "PFSA");
 	PFSA H = SCC_UTIL__::read_mc(XPFSA_filename, "XPFSA");
+	H.describe("transducer");
 
 	double range = max - min;
 	double step_size = range / (num_samples - 1);
