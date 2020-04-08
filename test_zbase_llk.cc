@@ -111,7 +111,7 @@ The input includes:\n\
 \t3) A sequence length, length;\n\
 \t4) A minimum value(inclusive), min, for the range of scalar, with default -2;\n\
 \t5) A maximum value(inclusive), max, for the range of scaler, with default 2;\n\
-\t\t (max must be strictly greater than min);\n\ 
+\t\t (max must be strictly greater than min);\n\
 \t6) Number of sampling points, num_samples, between min and max;\n\
 \t\t (num_samples cannot be less than 2 with default value 2).\n\n\
 The output is a file that has num_samples + 2 lines with:\n\
@@ -131,7 +131,7 @@ Example (in zutil_ folder):\n\
     ("length,l", value<size_t>(&length)->default_value(1000), "Length of the sequence.")
     ("min,a", value<double>(&min)->default_value(-2), "Minimum value of the range.")
     ("max,b", value<double>(&max)->default_value(2), "Maximum value of the range. Must be strictly bigger than min.")
-    ("num_samples,n", value<size_t>(&num_samples)->default_value(2), "Number of sample points.\ 
+    ("num_samples,n", value<size_t>(&num_samples)->default_value(2), "Number of sample points.\
  The first sample point is min while the last sample point is max.");
   	variables_map vm;
   	if (argc == 1)
@@ -162,7 +162,7 @@ Example (in zutil_ folder):\n\
 	// Other parameter errors
 	if (vm.count("num_samples"))
 	{
-		if (num_samples <= 2)
+		if (num_samples < 2)
 		{
 			cout << "num_samples must be at least 2!" << endl;
 			return 1;

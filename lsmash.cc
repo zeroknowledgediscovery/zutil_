@@ -189,7 +189,7 @@ Example Usage:\n\
 	}
       unsigned int num_elements=S.size();
       
-#pragma omp parallel for 
+//#pragma omp parallel for 
       for (unsigned int i = 0; i < num_elements; i++)
 	{
 	  double sum=0.0;

@@ -1,22 +1,22 @@
 CC = g++ -std=c++17
 
-CFLAGS = -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
+# CFLAGS = -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
 CFLAGS =  -static -O3 -Wall -Wextra -Wunused -fopenmp -Wl,--as-needed
 
 ZBASE=./zbase
 
-LIBSO=  -lgomp  -lm 
-LIBS=   -lboost_system -lboost_thread -lboost_program_options -lboost_timer  -lboost_chrono -Bdynamic -lgsl -lgslcblas
+# LIBSO=  -lgomp  -lm 
+# LIBS=   -lboost_system -lboost_thread -lboost_program_options -lboost_timer  -lboost_chrono -Bdynamic -lgsl -lgslcblas
 
-LIBSO=  -static-libstdc++ -static-libgcc -lgomp  -lm 
-LIBS=   -lboost_system -lboost_thread -lboost_program_options -lboost_timer  -lboost_chrono -Bdynamic -lgsl -lgslcblas
+LIBSO= -static-libstdc++ -static-libgcc -lgomp -lm 
+LIBS= -lboost_system -lboost_thread -lboost_program_options -lboost_filesystem -lboost_timer -lboost_chrono -Bdynamic -lgsl -lgslcblas
 LIBPATH= $(ZBASE)/lib
 
 DEPS = 
 INCLUDES = -I$(ZBASE)
 
-
-OBJ = test_zbase test_zbase_random test_zbase_dist test_zbase_llk test_po test_zbase_HMM_llk testGammaEst testGammaEst_Cor testGammaEst_Cor_1
+# OBJ = test_zbase test_zbase_random test_zbase_dist test_zbase_HMM_llk
+OBJ = test_zbase_llk transducerStudy testGammaEst testGammaEst_Cor testGammaEst_Cor_1 llk_baseChoice genRandPFSA
 
 all:	$(OBJ)  clear mvbin
 
@@ -27,22 +27,22 @@ all:	$(OBJ)  clear mvbin
 %.o :	%.cc
 	$(CC) $(INCLUDES)  -c -o $@ $< $(CFLAGS)
 
-test_zbase:	test_zbase.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
-
-test_zbase_random:	test_zbase_random.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
-
-test_zbase_dist:	test_zbase_dist.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+# test_zbase:	test_zbase.o
+# 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+# 
+# test_zbase_random:	test_zbase_random.o
+# 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+# 
+# test_zbase_dist:	test_zbase_dist.o
+# 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+# 
+# test_zbase_HMM_llk:	test_zbase_HMM_llk.o
+# 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 test_zbase_llk:	test_zbase_llk.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
-test_zbase_HMM_llk:	test_zbase_HMM_llk.o
-	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
-
-test_po:	test_po.o
+transducerStudy: transducerStudy.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 testGammaEst:	testGammaEst.o
@@ -54,6 +54,11 @@ testGammaEst_Cor:	testGammaEst_Cor.o
 testGammaEst_Cor_1:	testGammaEst_Cor_1.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
+llk_baseChoice:	llk_baseChoice.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+genRandPFSA:	genRandPFSA.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 # utility commands --------------------------------
 
 clear:	
