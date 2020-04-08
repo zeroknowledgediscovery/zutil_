@@ -92,6 +92,8 @@ int main(int argc, char *argv[])
   unsigned int repeat=20;
   unsigned int DEPTH=8;
 
+  vector<PFSA> PFSA_vec;
+
   options_description desc( "### Loglikelihood zed.uchicago.edu 2018 ###\n\
 --------------------------\n\
 Example Usage:\n\
@@ -148,6 +150,14 @@ Example Usage:\n\
       exit(0);
       return 1;
     }
+  if (vm.count("pfsafile"))
+	{
+	  for (string PFSA_filename : pfsafile)
+    {
+		PFSA G = SCC_UTIL__::read_mc(PFSA_filename, "PFSA");
+		PFSA_vec.push_back(G);
+	}
+	}
 
   if(seqfile=="")
       MESSAGE("ERROR: empty seq file");
@@ -172,10 +182,16 @@ Example Usage:\n\
   if (TIMER)
     {
       timer::auto_cpu_timer t;
-      D=llk_distance(S);
+	  if (PFSA_vec.size() > 0)
+        D=llk_distance(S, PFSA_vec);
+      else
+        D=llk_distance(S);
     }
   else
-    D=llk_distance(S);
+    if (PFSA_vec.size() > 0)
+      D=llk_distance(S, PFSA_vec);
+    else
+      D=llk_distance(S);
 
   if(SAE)
     {
