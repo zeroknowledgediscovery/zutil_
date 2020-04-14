@@ -16,7 +16,7 @@ DEPS =
 INCLUDES = -I$(ZBASE)
 
 # OBJ = test_zbase test_zbase_random test_zbase_dist test_zbase_HMM_llk
-OBJ = test_zbase_llk transducerStudy testGammaEst testGammaEst_Cor testGammaEst_Cor_1 llk_baseChoice genRandPFSA
+OBJ = test_zbase_llk transducerStudy testGammaEst testGammaEst_Cor testGammaEst_Cor_1 llk_baseChoice genRandPFSA lsmash_classification
 
 all:	$(OBJ)  clear mvbin
 
@@ -58,6 +58,9 @@ llk_baseChoice:	llk_baseChoice.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 genRandPFSA:	genRandPFSA.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+lsmash_classification:	lsmash_classification.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 # utility commands --------------------------------
 

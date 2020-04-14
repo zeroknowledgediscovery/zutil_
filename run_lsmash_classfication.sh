@@ -1,0 +1,34 @@
+#!/bin/bash
+
+get_name () {
+	file=$1
+	index=`echo $file | awk -F"." '{print length($0)-length($NF)}'`
+	if [[ $index == 0 ]]
+	then
+		label_file=${file}_$2
+	else
+		prefix=${file:0:(($index-1))}
+		suffix=${file:$index:((${#file} - $index))}
+		label_file=${prefix}_$2.${suffix}
+	fi
+	echo $label_file
+}
+
+train_label_file=`get_name $1 label`
+test_label_file=`get_name $2 label`
+
+train_seq_file=`get_name $1 seq`
+test_seq_file=`get_name $2 seq`
+
+train_coord_file=`get_name $1 coord`
+test_coord_file=`get_name $2 coord`
+
+awk -F"\t" '{print $1}' $1 > $train_label_file
+awk -F"\t" '{print $1}' $2 > $test_label_file
+awk -F"\t" '{for(i=2;i<=NF;i++){ printf("%s",( (i>2) ? " " : "" ) $i) } ; print ;}' $1 > $train_seq_file
+awk -F"\t" '{for(i=2;i<=NF;i++){ printf("%s",( (i>2) ? " " : "" ) $i) } ; print ;}' $1 > $test_seq_file
+
+cmd="./lsmash_classification -f $train_seq_file -g $test_seq_file -l $train_label_file -k $test_label_file -c $train_coord_file -d $test_coord_file -u 1 -P 0 -T continuous"
+eval $cmd
+rm $train_seq_file $test_seq_file $train_label_file $test_label_file
+
