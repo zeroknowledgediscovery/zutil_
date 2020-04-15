@@ -13,7 +13,7 @@ get_name () {
 	fi
 	echo $label_file
 }
-
+eval ./dtw_ucr_compiled $1 $2
 train_label_file=`get_name $1 label`
 test_label_file=`get_name $2 label`
 
