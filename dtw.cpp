@@ -2,9 +2,10 @@
 #include <math.h>
 #include <vector> 
 #include <omp.h>
-#include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string> 
+#include <iostream>
 
 
 #define INF 1e20       //Pseudo Infitinte number for this code
@@ -103,7 +104,7 @@ istream& operator>>(istream& str, reader& row)
 
 int main(int argc, char *argv[])
 {
-    vector<vector<double>> train;  
+    vector<vector<double> > train;  
     
     ifstream file_TRAIN(argv[1]); 
     reader row;
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
 	size_t dim = train.size();
 	int window_size = stoi(argv[2]);
 
-	vector<vector<double>> matrix(dim, vector<double>(dim, 0));
+	vector<vector<double> > matrix(dim, vector<double>(dim, 0));
     for (size_t i = 0; i < dim; i++) 
 	{
 		double min_dist = INF;
