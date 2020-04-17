@@ -12,6 +12,8 @@
 
 #define DEBUG_ 0
 
+
+
 using namespace boost::program_options;
 //------------------------------------
 template<typename Numeric, typename Generator = std::mt19937>
@@ -86,7 +88,7 @@ int main(int argc, char *argv[])
   vector <double> partition;
   string DATA_TYPE="symbolic";
   bool DERIVATIVE=false;
-  bool TIMER=false, PRINT_MC=false;
+  bool TIMER=true, PRINT_MC=false;
   unsigned int RANDOM_MC=0;
   bool SAE=true;
   unsigned int repeat=20;
@@ -112,7 +114,7 @@ Example Usage:\n\
     ("partition,P",value< vector<double> >(&partition)->multitoken(), "partition")
     ("use_derivative,u",value<bool>(&DERIVATIVE), "use derivative [false]")
     ("pfsafile,F",value< vector<string> >(&pfsafile)->multitoken(), "pfsa files")
-    ("timer,t",value< bool >(&TIMER), "display timer [0 (false)] ")
+    ("timer,t",value< bool >(&TIMER)->default_value(true), "display timer ")
     ("sae,S",value< bool >(&SAE), "use data smash for sae [1 (true)] ")
     ("numrepeat,n",value< unsigned int >(&repeat), "repeat for sae [20] ")
     ("dfile,o",value< string >(&ofile), "output file [L.dst]")
