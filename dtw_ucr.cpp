@@ -5,7 +5,7 @@
 #include <omp.h>
 #include <fstream>
 #include <sstream>
-
+#include <boost/timer/timer.hpp>
 
 #define INF 1e20       //Pseudo Infitinte number for this code
 #define min(x,y) ((x)<(y)?(x):(y))
@@ -121,7 +121,7 @@ class UCRRow
         }
     
     private:
-        vector<double>    m_data;
+        std::vector<double>    m_data;
         double label;
         double sq_sum;
         double sum;
@@ -137,52 +137,46 @@ std::istream& operator>>(std::istream& str, UCRRow& data)
 int main(int argc, char *argv[])
 {
     vector<vector<double>> train;  
-    vector<double> label_train;
+    vector<double> lable_train;
     vector<vector<double>> test;  
-    vector<double> label_test;   
+    vector<double> lable_test;   
     
-    ifstream file_TRAIN(argv[1]); 
+    std::ifstream       file_TRAIN(argv[1]); 
     UCRRow row;
 
     while(file_TRAIN >> row)
     {
         //row.normalize();
         train.push_back(row.get_vec());
-        label_train.push_back(row.get_label());
+        lable_train.push_back(row.get_label());
     }
 
-    ifstream file_TEST(argv[2]);
+    std::ifstream       file_TEST(argv[2]);
     
     while(file_TEST >> row)
     {   
         //row.normalize();
         test.push_back(row.get_vec());
-        label_test.push_back(row.get_label());
+        lable_test.push_back(row.get_label());
     }
     vector<double> test_predicted (test.size(),0);
     double correctly_predicted = 0.0;
     
-    #if defined(_OPENMP)    
-        omp_set_num_threads(28);
-        #pragma omp parallel
-        #pragma omp for reduction(+:correctly_predicted)
-    #endif
-    for (int tst = 0; tst < test.size(); tst = tst + 1) 
-	{
+	boost::timer::auto_cpu_timer t;
+    for ( int tst = 0; tst < test.size(); tst = tst + 1 ) {
         double min_dist = INF;
-        for (int tes = 0; tes < train.size(); tes = tes + 1) 
-		{
+        for ( int tes = 0; tes < train.size(); tes = tes + 1 ) {
             double dist =  dtw(test[tst], train[tes], train[tes].size(), min_dist);
             if (dist < min_dist) {
                 min_dist = dist;
-                test_predicted[tst] = label_train[tes];
+                test_predicted[tst] = lable_train[tes];
             }
         } 
-		if (label_test[tst] == test_predicted[tst]) {
-			correctly_predicted = correctly_predicted + 1;
+            if (lable_test[tst] == test_predicted[tst]) {
+                correctly_predicted = correctly_predicted + 1;
         }
     } 
 
-    std::cout << "accuracy = " << correctly_predicted/label_test.size() << endl;
+    std::cout << "accuracy = " << correctly_predicted/lable_test.size() << endl;
     return 0;
 }
