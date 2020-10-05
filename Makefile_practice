@@ -16,7 +16,7 @@ DEPS =
 INCLUDES = -I$(ZBASE)
 
 # OBJ = test_zbase test_zbase_random test_zbase_dist test_zbase_HMM_llk
-OBJ = test_zbase_llk transducerStudy testGammaEst testGammaEst_Cor testGammaEst_Cor_1 llk_baseChoice genRandPFSA lsmash_classification
+OBJ = test_zbase_llk transducerStudy testGammaEst testGammaEst_Cor testGammaEst_Cor_1 llk_baseChoice genRandPFSA lsmash_classification gen_seq_simple gen_seq_deletionChannel
 
 all:	$(OBJ)  clear mvbin
 
@@ -55,6 +55,12 @@ testGammaEst_Cor_1:	testGammaEst_Cor_1.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 llk_baseChoice:	llk_baseChoice.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+gen_seq_simple:	gen_seq_simple.o
+	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
+
+gen_seq_deletionChannel:	gen_seq_deletionChannel.o
 	$(CC)  $(CFLAGS) -o $@ $^  -L$(LIBPATH) -lsemcrct -lconfigfile $(LIBSO) $(LIBS) 
 
 genRandPFSA:	genRandPFSA.o

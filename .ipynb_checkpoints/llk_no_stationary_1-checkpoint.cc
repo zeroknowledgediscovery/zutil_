@@ -12,6 +12,30 @@
 
 using namespace boost::program_options;
 //------------------------------------
+//
+bool is_positive(PFSA& G)
+{
+	connx aut = G.get_aut();
+	pitilde pit = G.get_pit();
+  	const unsigned int numstates = aut.size();
+	const unsigned int alphabet = aut[0].size();
+
+	for (size_t i = 0; i < numstates; i++)
+	{
+		map_sym_state aut_row = aut[i];
+		vector<double> pit_row = pit[i];
+		for (symbol symb(0); symb < alphabet; symb++)
+		{
+			state s = aut_row[symb];
+			double pr = pit_row[symb];
+			if ((s == -1) || (pr < 1e-10))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
 
 double log_likelihood(PFSA& G, const symbol_list_& s)
 {
@@ -23,9 +47,44 @@ double log_likelihood(PFSA& G, const symbol_list_& s)
 	connx aut = G.get_aut();
 	pitilde pit = G.get_pit();
   	const unsigned int numstates = aut.size();
-	// const unsigned int alphabet = aut[0].size();
 
-  	map<symbol, vector<double>> map_pitcol;
+	vector<int> states;
+	for (size_t i = 0; i < numstates; i++)
+	{
+		states.push_back(i);
+	}
+	random_shuffle(states.begin(), states.end());
+
+	for (size_t i = 0; i < numstates; i++)
+	{
+		double llk = 0;
+		bool is_successful = true;
+		state curr_state = states[i];
+		for(unsigned int j = 0; j < s.size(); j++)
+		{
+			symbol symb = s[j];
+			double pr = pit[curr_state][symb];
+			curr_state = aut[curr_state][symb];
+			if ((curr_state == -1) || (pr == 0))
+			{
+				is_successful = false;
+				break;
+			}
+			else
+			{
+		  		llk += log(pr);
+			}
+		}	
+		if (is_successful)
+		{
+			return -llk / s.size();
+		}
+	}
+	
+	// vector<double> stationary(G.get_Stationary());
+	vector<double> curr_state(numstates, 1. / numstates);
+  	
+	map<symbol, vector<double>> map_pitcol;
   	for(unsigned int st = 0; st < numstates; st++)
 	{
     	for(symbol i(0); i < G.get_aut()[0].size(); i++)
@@ -33,11 +92,8 @@ double log_likelihood(PFSA& G, const symbol_list_& s)
       		map_pitcol[i].push_back(G.get_pit()[st][i]);
 		}
 	}
-  	
-	// vector<double> stationary(G.get_Stationary());
-	vector<double> curr_state(numstates, 1. / numstates);
 
-	double llk = 0.0;
+	double llk = 0;
 	for(unsigned int i = 0; i < s.size(); i++)
 	{
 		double pr = 0;
@@ -50,7 +106,7 @@ double log_likelihood(PFSA& G, const symbol_list_& s)
 	  	vector <double> state_vec_tmp(curr_state);
 	  	for (unsigned int k = 0; k < numstates; k++)
 		{
-	  		double V = 0.0000001;
+	  		double V = 1e-7;
 	  		for (unsigned int j = 0; j < numstates; j++)
 			{
 	    		V += G.get_Gamma()[s[i]][j][k] * state_vec_tmp[j];
@@ -73,7 +129,6 @@ double log_likelihood(PFSA& G, const symbol_list_& s)
 			curr_state[i] *= S;
 		}	
 	}
-		
 	return -llk / s.size();
 }
 
@@ -143,21 +198,20 @@ int main(int argc, char *argv[])
 	srand(time(NULL));
   
   	PFSA G = SCC_UTIL__::read_mc(pfsafile, "PFSA");
-  	vector<double> stationary_dist(G.get_Stationary());
-  	map<symbol, vector<vector<double>>> Gamma(G.get_Gamma());
-  	vector<vector<double>>  PI_(G.get_PI());
 
   	data_reader *R;
   	R = new data_reader(seqfile, DATA_DIR, len);
   	vector<Symbolic_string_> Svec(R->getsymbolic_string_vector());
 
-  	vector<double> llk;
+  	vector<double> llk(Svec.size(), 0);
+    #pragma omp parallel for
   	for(unsigned int i = 0; i < Svec.size(); i++)
 	{
-    	llk.push_back(log_likelihood(G, Svec[i].get_symbol_list()));
+    	llk[i] = log_likelihood(G, Svec[i].get_symbol_list());
 	}
 
 	cout << llk << endl;
+	// cout << "Is the PFSA positive? " << is_positive(G) << endl;
 
   	if(DEBUG_)
     {
