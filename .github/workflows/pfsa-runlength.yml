@@ -1,0 +1,74 @@
+name: PFSA run-length decode
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_len:
+        description: "Base symbols per encoded bit"
+        required: false
+        default: "500"
+      scan_win:
+        description: "LSmash sliding-window length"
+        required: false
+        default: "250"
+      scan_step:
+        description: "Sliding-window step"
+        required: false
+        default: "50"
+  push:
+    branches: [master]
+    paths:
+      - "testsuite/pfsa_runlength_decode_reference.sh"
+      - "testsuite/pfsa_opt/**"
+      - "prun.cc"
+      - "lsmash.cc"
+      - ".github/workflows/pfsa-runlength.yml"
+
+jobs:
+  runlength-decode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inspect bundled binaries
+        run: |
+          file bin/prun bin/lsmash || true
+          chmod +x bin/prun bin/lsmash testsuite/pfsa_runlength_decode_reference.sh
+
+      - name: Install runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgsl-dev libboost-all-dev
+
+      - name: Run PFSA run-length decoding experiment
+        env:
+          BASE_LEN: ${{ inputs.base_len || '500' }}
+          SCAN_WIN: ${{ inputs.scan_win || '250' }}
+          SCAN_STEP: ${{ inputs.scan_step || '50' }}
+          OUT: testsuite/actions_runlength
+        run: |
+          ./testsuite/pfsa_runlength_decode_reference.sh
+          cat testsuite/actions_runlength/runlength_summary.txt
+
+      - name: Add summary
+        if: always()
+        run: |
+          echo "## PFSA run-length decode" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f testsuite/actions_runlength/runlength_summary.txt ]; then
+            echo '~~~text' >> "$GITHUB_STEP_SUMMARY"
+            cat testsuite/actions_runlength/runlength_summary.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '~~~' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Experiment did not produce runlength_summary.txt." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload experiment artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pfsa-runlength-results
+          path: |
+            testsuite/actions_runlength/
+          if-no-files-found: warn
+          retention-days: 14
