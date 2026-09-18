@@ -1,0 +1,49 @@
+name: PFSA run-length length sweep
+
+on:
+  workflow_dispatch:
+    inputs:
+      lengths:
+        description: "Space-separated base lengths"
+        required: false
+        default: "125 250 500 750 1000 1500 2000"
+      reps:
+        description: "Independent repetitions per length"
+        required: false
+        default: "20"
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare
+        run: |
+          chmod +x bin/prun bin/lsmash testsuite/pfsa_runlength_decode_reference.sh testsuite/pfsa_runlength_sweep.sh
+          sudo apt-get update
+          sudo apt-get install -y libgsl-dev libboost-all-dev
+      - name: Run sweep
+        env:
+          LENGTHS: ${{ inputs.lengths || '125 250 500 750 1000 1500 2000' }}
+          REPS: ${{ inputs.reps || '20' }}
+          OUT: testsuite/actions_runlength_sweep
+        run: |
+          ./testsuite/pfsa_runlength_sweep.sh
+          cat testsuite/actions_runlength_sweep/summary.tsv
+      - name: Summary
+        if: always()
+        run: |
+          echo "## PFSA stochastic-code length sweep" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f testsuite/actions_runlength_sweep/summary.tsv ]; then
+            echo '~~~text' >> "$GITHUB_STEP_SUMMARY"
+            cat testsuite/actions_runlength_sweep/summary.tsv >> "$GITHUB_STEP_SUMMARY"
+            echo '~~~' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pfsa-runlength-sweep
+          path: testsuite/actions_runlength_sweep/
+          retention-days: 14
