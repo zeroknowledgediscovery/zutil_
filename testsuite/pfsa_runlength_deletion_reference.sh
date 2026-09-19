@@ -183,7 +183,7 @@ with (out/"inferred_runs.tsv").open("w") as f:
         dur=ee-ss
         cnt=max(1,int(round(dur/Leff)))
         predbits.append(str(s)*cnt)
-        f.write(f"{q}\t{s}\t{ss}\t{ee}\t{dur}\t{cnt}\t{dur/L:.6f}\n")
+        f.write(f"{q}\t{s}\t{ss}\t{ee}\t{dur}\t{cnt}\t{dur/Leff:.6f}\n")
 (out/"decoded_bits.txt").write_text("".join(predbits)+"\n")
 PY
 
